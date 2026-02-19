@@ -5,7 +5,10 @@ async function write(filePath, data) {
   return new Promise((resolve, reject) => {
     const ws = fs.createWriteStream(filePath);
 
-    const csvStream = format({ headers: true });
+    const csvStream = format({
+      headers: true,
+      delimiter: "\t",
+    });
 
     csvStream
       .on("error", reject)

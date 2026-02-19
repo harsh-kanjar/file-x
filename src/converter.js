@@ -3,16 +3,15 @@ const path = require("path");
 const readers = {
   ".csv": require("./readers/csv"),
   ".tsv": require("./readers/tsv"),
-  ".txt": require("./readers/txt"),
+  ".json": require("./readers/json"),
   ".xlsx": require("./readers/xlsx"),
-  ".parquet": require("./readers/parquet"),
 };
 
 const writers = {
   ".csv": require("./writers/csv"),
+  ".tsv": require("./writers/tsv"),
   ".json": require("./writers/json"),
   ".xlsx": require("./writers/xlsx"),
-  ".parquet": require("./writers/parquet"),
 };
 
 async function convert(inputPath, outputPath) {
@@ -27,10 +26,7 @@ async function convert(inputPath, outputPath) {
     throw new Error(`Unsupported output format: ${outputExt}`);
   }
 
-  // 1️⃣ Read input → JSON
   const data = await readers[inputExt].read(inputPath);
-
-  // 2️⃣ Write JSON → output format
   await writers[outputExt].write(outputPath, data);
 
   return {

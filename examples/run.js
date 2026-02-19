@@ -2,7 +2,7 @@ const { convert } = require("../src");
 
 (async () => {
   try {
-    await convert("examples/sample.csv", "examples/yo-output.json");
+    await convert("examples/output.tsv", "examples/output.json");
     console.log("Conversion successful");
   } catch (err) {
     console.error(err);
