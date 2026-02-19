@@ -1,10 +1,10 @@
-const path = require("path");
-const { csvToJson } = require("../src");
+const { convert } = require("../src");
 
 (async () => {
-  const input = path.join(__dirname, "sample.csv");
-  const output = path.join(__dirname, "output.json");
-
-  const result = await csvToJson(input, output);
-  console.log(result);
+  try {
+    await convert("examples/sample.csv", "examples/yo-output.json");
+    console.log("Conversion successful");
+  } catch (err) {
+    console.error(err);
+  }
 })();

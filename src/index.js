@@ -1,5 +1,7 @@
-const { csvToJson } = require("./converter");
+// src/index.js
+
+const { convert } = require("./converter");
 
 module.exports = {
-  csvToJson,
+  convert,
 };

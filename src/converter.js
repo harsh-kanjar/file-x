@@ -1,39 +1,42 @@
-const fs = require("fs");
 const path = require("path");
-const { parseCSV } = require("./utils/parser");
 
-async function csvToJson(inputPath, outputPath = null) {
+const readers = {
+  ".csv": require("./readers/csv"),
+  ".tsv": require("./readers/tsv"),
+  ".txt": require("./readers/txt"),
+  ".xlsx": require("./readers/xlsx"),
+  ".parquet": require("./readers/parquet"),
+};
 
-  // 🔹 1. Check if input exists
-  if (!fs.existsSync(inputPath)) {
-    throw new Error("Input file does not exist.");
+const writers = {
+  ".csv": require("./writers/csv"),
+  ".json": require("./writers/json"),
+  ".xlsx": require("./writers/xlsx"),
+  ".parquet": require("./writers/parquet"),
+};
+
+async function convert(inputPath, outputPath) {
+  const inputExt = path.extname(inputPath).toLowerCase();
+  const outputExt = path.extname(outputPath).toLowerCase();
+
+  if (!readers[inputExt]) {
+    throw new Error(`Unsupported input format: ${inputExt}`);
   }
 
-  // 🔹 2. Check if file is CSV
-  if (path.extname(inputPath).toLowerCase() !== ".csv") {
-    throw new Error("Input file must be a CSV file.");
+  if (!writers[outputExt]) {
+    throw new Error(`Unsupported output format: ${outputExt}`);
   }
 
-  const jsonData = await parseCSV(inputPath);
+  // 1️⃣ Read input → JSON
+  const data = await readers[inputExt].read(inputPath);
 
-  if (outputPath) {
-    const resolvedPath = path.resolve(outputPath);
+  // 2️⃣ Write JSON → output format
+  await writers[outputExt].write(outputPath, data);
 
-    // Optional: Ensure output is .json
-    if (path.extname(resolvedPath).toLowerCase() !== ".json") {
-      throw new Error("Output file must have .json extension.");
-    }
-
-    fs.writeFileSync(resolvedPath, JSON.stringify(jsonData, null, 2));
-
-    return {
-      success: true,
-      message: "JSON file created successfully",
-      path: resolvedPath,
-    };
-  }
-
-  return jsonData;
+  return {
+    success: true,
+    message: `Converted ${inputExt} → ${outputExt}`,
+  };
 }
 
-module.exports = { csvToJson };
+module.exports = { convert };
